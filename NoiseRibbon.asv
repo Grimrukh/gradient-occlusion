@@ -1,0 +1,25 @@
+function blended_image = NoiseRibbon(ribbon_image,alpha)
+    
+    % Assumes 16-bit ribbon image
+    
+    if isa(ribbon_image,'char')
+        load(sprintf('images/%s_pixels.mat',ribbon_image));
+        ribbon_image = double(ReadGray(sprintf('images/%s.tif',ribbon_image)));
+    else
+        error('Please give string for ribbon name.');
+    end
+    
+    noise_image = double(ReadGray('sine_image_1.25_0.13.tif'));
+    noise_image = noise_image(513:1536,513:1536) .* ribbon_pixels;
+    
+    blended_image = ribbon_image*(1-alpha) + noise_image*(alpha);
+    blended_image = blended_image.*ribbon_pixels + ribbon_image.*(1-ribbon_pixels);
+    
+    % Put in (0.2 - 0.8) range
+    min = min(blended_image(:));
+    max = max(blended_image(:));
+    blended_image = uint16(blended_image);
+    figure(1)
+    imshow(blended_image);
+    
+end
