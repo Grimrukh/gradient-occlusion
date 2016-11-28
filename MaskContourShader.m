@@ -5,7 +5,7 @@ function MaskContourShader(mask)
     
     if isa(mask,'char')
         mask_name = mask;
-        mask = ReadGray(sprintf('images/masks/%s_mask.tif',mask));
+        mask = ReadGray(sprintf('images/terrains/masks/%s.tif',mask));
     end
     
     if isa(mask,'uint16')
@@ -17,11 +17,11 @@ function MaskContourShader(mask)
     binary = imbinarize(mask);
     edges = edge(binary);
     try
-        load(sprintf('vectors/%s_valid.mat',mask_name));
+        load(sprintf('images/terrains/masks/vectors/%s.mat',mask_name));
     catch
         disp('Could not load vectors. Creating and saving...');
         [~,vectors] = AnalyseMaskEdges(binary);
-        save(sprintf('vectors/%s_valid.mat',mask_name),'vectors');
+        save(sprintf('images/terrains/masks/vectors/%s.mat',mask_name),'vectors');
     end
     dists = bwdist(edges);
     
@@ -59,7 +59,7 @@ function MaskContourShader(mask)
     IDWimage = CreateIDW(ribbon_pixels,edges,IDWweight,IDWradius);
     imwrite(IDWimage,sprintf('images/%s_width%d_weight%d_narrow.tif',mask_name,width,IDWweight),'tif');
     save(sprintf('images/%s_width%d_weight%d_narrow_pixels.mat',mask_name,width,IDWweight),'ribbon_pixels');
-    figure(1)
+    figure(1); clf;
     imshow(IDWimage);
     
     function IDWimage = CreateIDW(IDWpixels,IDWstations,weight,r)
